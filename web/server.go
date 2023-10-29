@@ -35,7 +35,14 @@ func (h *HTTPServer) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 
 func (h *HTTPServer) serve(ctx *Context) {
 	// 查找路由，命中逻辑
-
+	node, ok := h.findRoute(ctx.Req.Host, ctx.Req.URL.Path)
+	if !ok || node.handler == nil {
+		// 404
+		ctx.Resp.WriteHeader(404)
+		ctx.Resp.Write([]byte("details not found"))
+		return
+	}
+	node.handler(ctx)
 }
 
 func (h *HTTPServer) Start() error {
